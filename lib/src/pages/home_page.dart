@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:qr_reader_app/src/bloc/scan_block.dart';
+import 'package:qr_reader_app/src/models/scan_model.dart';
 import 'package:qr_reader_app/src/pages/directions_page.dart';
 import 'package:qr_reader_app/src/pages/maps_page.dart';
-
-import 'package:barcode_scan/barcode_scan.dart';
+import 'package:qr_reader_app/src/utils/utils.dart' as utils;
 
 class HomePage extends StatefulWidget {
   @override
@@ -10,6 +13,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final scansBloc = new ScansBloc();
+
   int currentIndex = 0;
 
   @override
@@ -20,7 +25,7 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             icon: Icon(Icons.delete_forever),
-            onPressed: () {},
+            onPressed: scansBloc.deleteAllScans,
           )
         ],
       ),
@@ -30,16 +35,17 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.filter_center_focus),
         backgroundColor: Theme.of(context).primaryColor,
-        onPressed: _scanQR,
+        onPressed: () => _scanQR(context),
       ),
     );
   }
 
-  _scanQR() async {
+  _scanQR(BuildContext context) async {
     // https://fernando-herrera.com
-    // geo:40.73255860802501, -73.89333143671877
+    // geo:40.73255860802501,-74.89333143671877
 
     // dynamic futureString = '';
+    String futureString = 'https://fernando-herrera.com';
 
     // try {
     //   futureString = await BarcodeScanner.scan();
@@ -47,11 +53,21 @@ class _HomePageState extends State<HomePage> {
     //   futureString = e.toString();
     // }
 
-    // print('Future String: $futureString');
+    if (futureString != null) {
+      final scan = ScanModel(valor: futureString);
+      scansBloc.addScan(scan);
+      final scan2 =
+          ScanModel(valor: 'geo:40.724233047051705,-74.00731459101564');
+      scansBloc.addScan(scan2);
 
-    // if (futureString != null) {
-    //   print('Tenemos información');
-    // }
+      if (Platform.isIOS) {
+        Future.delayed(Duration(milliseconds: 750), () {
+          utils.openScan(context, scan);
+        });
+      } else {
+        utils.openScan(context, scan);
+      }
+    }
   }
 
   Widget _createBottomNavidationBar() {
