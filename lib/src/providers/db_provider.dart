@@ -46,6 +46,7 @@ class DBProvider {
   newScan(ScanModel newScan) async {
     final db = await database;
     final res = await db.insert('Scans', newScan.toJson());
+    print('RES: ' + res.toString());
     return res;
   }
 

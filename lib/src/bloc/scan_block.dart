@@ -1,8 +1,9 @@
 import 'dart:async';
 
+import 'package:qr_reader_app/src/bloc/validator.dart';
 import 'package:qr_reader_app/src/providers/db_provider.dart';
 
-class ScansBloc {
+class ScansBloc with Validators {
   static final ScansBloc _singleton = new ScansBloc._internal();
   factory ScansBloc() {
     return _singleton;
@@ -16,7 +17,12 @@ class ScansBloc {
   // Stream
   final _scansController = StreamController<List<ScanModel>>.broadcast();
 
-  Stream<List<ScanModel>> get scansStream => _scansController.stream;
+  // for geo locations
+  Stream<List<ScanModel>> get scansStream =>
+      _scansController.stream.transform(validateGeo);
+  // for http urls
+  Stream<List<ScanModel>> get scansStreamHttp =>
+      _scansController.stream.transform(validateHttp);
 
   dispose() {
     _scansController?.close();

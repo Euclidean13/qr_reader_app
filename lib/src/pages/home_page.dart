@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_reader_app/src/bloc/scan_block.dart';
 import 'package:qr_reader_app/src/models/scan_model.dart';
@@ -44,24 +45,20 @@ class _HomePageState extends State<HomePage> {
     // https://fernando-herrera.com
     // geo:40.73255860802501,-74.89333143671877
 
-    // dynamic futureString = '';
-    String futureString = 'https://fernando-herrera.com';
+    dynamic futureString;
 
-    // try {
-    //   futureString = await BarcodeScanner.scan();
-    // } catch (e) {
-    //   futureString = e.toString();
-    // }
+    try {
+      futureString = await BarcodeScanner.scan();
+    } catch (e) {
+      futureString = e.toString();
+    }
 
     if (futureString != null) {
-      final scan = ScanModel(valor: futureString);
+      final scan = ScanModel(valor: futureString.rawContent.toString());
       scansBloc.addScan(scan);
-      final scan2 =
-          ScanModel(valor: 'geo:40.724233047051705,-74.00731459101564');
-      scansBloc.addScan(scan2);
 
       if (Platform.isIOS) {
-        Future.delayed(Duration(milliseconds: 750), () {
+        Future.delayed(Duration(milliseconds: 1500), () {
           utils.openScan(context, scan);
         });
       } else {
